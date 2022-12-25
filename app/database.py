@@ -1,13 +1,23 @@
-import pymongo
+from pymongo import MongoClient
 
 from app.config import settings
 
+mongo_client = MongoClient(host=settings.MONGO_HOST,
+                           port=int(settings.MONGO_PORT),
+                           username=settings.MONGO_INITDB_USERNAME,
+                           password=settings.MONGO_INITDB_PASSWORD)
 
-DATABASE_URL = "mongodb://{}:{}@localhost:6000/{}}?authSource=admin".format(
-    settings.MONGO_USER, settings.MONGO_PASS, settings.MONGO_DB
-)
-client = pymongo.mongo_client.MongoClient(DATABASE_URL)
-print("CONNECTED TO MONGO")
+db = mongo_client[settings.MONGO_INITDB_DATABASE]
 
-db = client[settings.MONGO_DB]
-Shop = db.shops
+shop_collection = db["shops"]
+
+
+def shop_helper(shop) -> dict:
+    return {
+        "id": str(shop["_id"]),
+        "name": shop["name"],
+        "lat": shop["lat"],
+        "lon": shop["lon"],
+        "address": shop["address"],
+        "city": shop["city"],
+    }
